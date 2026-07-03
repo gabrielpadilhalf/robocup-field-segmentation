@@ -1,0 +1,16 @@
+project:
+  name: robocup-field-segmentation
+  task: binary_field_segmentation
+
+dataset:
+  name: torso21
+  input_size: [640, 640]
+
+training:
+  seed: 42
+  epochs: 50
+  batch_size: 8
+
+evaluation:
+  primary_metrics: ["iou_field", "dice"]
+
