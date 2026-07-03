@@ -4,6 +4,13 @@ project:
 
 dataset:
   name: torso21
+  root: .local/dataset/reality
+  train_subset: train
+  val_subset: train
+  test_subset: test
+  train_split_file: .local/splits/train.txt
+  val_split_file: .local/splits/val.txt
+  test_split_file: .local/dataset/reality/test_images.txt
   input_size: [640, 640]
 
 training:
@@ -13,4 +20,3 @@ training:
 
 evaluation:
   primary_metrics: ["iou_field", "dice"]
-
