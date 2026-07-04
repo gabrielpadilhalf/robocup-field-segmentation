@@ -40,7 +40,7 @@ class UNet(nn.Module):
     """
     UNet architecture for image segmentation.
     """
-    def __init__(self, in_channels: int, n_classes: int):
+    def __init__(self, in_channels: int = 3, n_classes: int = 2):
         """
         Initialize UNet model.
         Args:
