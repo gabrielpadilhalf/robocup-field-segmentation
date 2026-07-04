@@ -1,8 +1,8 @@
 model:
-  name: unet
+  name: small_unet
 
 training:
   seed: 42
   epochs: 50
-  batch_size: 3
+  batch_size: 14
 

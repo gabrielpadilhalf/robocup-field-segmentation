@@ -1,4 +1,4 @@
-"""U-Net baseline."""
+"""Small U-Net baseline."""
 
 import torch
 import torch.nn as nn
@@ -6,7 +6,7 @@ import torch.nn as nn
 
 class DoubleConv(nn.Module):
     """
-    Helper module for UNet that performs two consecutive convolutional layers with ReLU activation and dropout.
+    Helper module for SmallUNet that performs two consecutive convolutional layers with ReLU activation and dropout.
     """
     def __init__(self, in_channels: int, out_channels):
         """
@@ -38,7 +38,7 @@ class DoubleConv(nn.Module):
 
 class UNet(nn.Module):
     """
-    UNet architecture for image segmentation.
+    Small U-Net architecture for image segmentation.
     """
     def __init__(self, in_channels: int = 3, n_classes: int = 2):
         """
@@ -49,41 +49,48 @@ class UNet(nn.Module):
         """
         super().__init__()
 
+        base_channels = 16
+        c1 = base_channels
+        c2 = 2 * base_channels
+        c3 = 4 * base_channels
+        c4 = 8 * base_channels
+        c5 = 16 * base_channels
+
         # Encoder
-        self.conv1 = DoubleConv(in_channels, 64)
+        self.conv1 = DoubleConv(in_channels, c1)
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv2 = DoubleConv(64, 128)
+        self.conv2 = DoubleConv(c1, c2)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv3 = DoubleConv(128, 256)
+        self.conv3 = DoubleConv(c2, c3)
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv4 = DoubleConv(256, 512)
+        self.conv4 = DoubleConv(c3, c4)
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        # Middle
-        self.conv5 = DoubleConv(512, 1024)
+        # Bottleneck
+        self.conv5 = DoubleConv(c4, c5)
 
         # Decoder
-        self.upconv6 = nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2)
-        self.conv6 = DoubleConv(1024, 512)
+        self.upconv6 = nn.ConvTranspose2d(c5, c4, kernel_size=2, stride=2)
+        self.conv6 = DoubleConv(c4 + c4, c4)
 
-        self.upconv7 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
-        self.conv7 = DoubleConv(512, 256)
+        self.upconv7 = nn.ConvTranspose2d(c4, c3, kernel_size=2, stride=2)
+        self.conv7 = DoubleConv(c3 + c3, c3)
 
-        self.upconv8 = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
-        self.conv8 = DoubleConv(256, 128)
+        self.upconv8 = nn.ConvTranspose2d(c3, c2, kernel_size=2, stride=2)
+        self.conv8 = DoubleConv(c2 + c2, c2)
 
-        self.upconv9 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
-        self.conv9 = DoubleConv(128, 64)
+        self.upconv9 = nn.ConvTranspose2d(c2, c1, kernel_size=2, stride=2)
+        self.conv9 = DoubleConv(c1 + c1, c1)
 
         # Output
-        self.out = nn.Conv2d(64, n_classes, kernel_size=1)
+        self.out = nn.Conv2d(c1, n_classes, kernel_size=1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass through UNet.
+        Forward pass through SmallUNet.
         Args:
             x (torch.Tensor): Input image tensor of shape [B, C, H, W].
         Returns:

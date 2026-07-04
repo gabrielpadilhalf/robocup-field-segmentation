@@ -13,7 +13,7 @@ if str(SRC_ROOT) not in sys.path:
 
 from field_segmentation.data.dataset import Torso21Dataset
 from field_segmentation.data.transforms import SegmentationTransform
-from field_segmentation.models.unet import UNet
+from field_segmentation.models.small_unet import UNet
 from field_segmentation.train.trainer import Trainer
 from field_segmentation.utils.config import load_config
 
