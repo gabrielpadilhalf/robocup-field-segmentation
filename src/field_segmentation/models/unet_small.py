@@ -1,2 +1,0 @@
-"""Small U-Net baseline."""
-
