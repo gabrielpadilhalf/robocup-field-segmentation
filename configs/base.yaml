@@ -2,6 +2,9 @@ project:
   name: robocup-field-segmentation
   task: binary_field_segmentation
 
+paths:
+  checkpoints_dir: .local/checkpoints
+
 dataset:
   name: torso21
   root: .local/dataset/reality

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import torch
@@ -21,6 +22,7 @@ class Trainer:
         val_loader: DataLoader,
     ):
         self.model = model
+        self.model_config = model_config
         self.config = model_config["training"]
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -29,6 +31,9 @@ class Trainer:
         torch.manual_seed(self.config["seed"])  # for reproducibility
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model = self.model.to(device)
+        checkpoints_dir = Path(self.model_config["paths"]["checkpoints_dir"])
+        checkpoints_dir.mkdir(parents=True, exist_ok=True)
+        best_weights_path = checkpoints_dir / "unet_best.pth"
 
         criterion = torch.nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
@@ -73,7 +78,7 @@ class Trainer:
             if val_metrics.iou > best_val_iou:
                 best_val_iou = val_metrics.iou
                 best_iteration = epoch
-                torch.save(model.state_dict(), "unet_best.pth")
+                torch.save(model.state_dict(), best_weights_path)
 
             print(
                 f"Epoch [{epoch+1}/{num_epochs}] | Train Loss: {train_loss:.4f} | "
@@ -82,5 +87,6 @@ class Trainer:
             )
 
         print(
-            f"Best model saved at epoch {best_iteration+1} with val iou {best_val_iou:.4f}"
+            f"Best model saved at epoch {best_iteration+1} with val iou "
+            f"{best_val_iou:.4f} at {best_weights_path}"
         )
