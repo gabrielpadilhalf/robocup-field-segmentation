@@ -86,7 +86,9 @@ class BottleneckBlock(nn.Module):
         if expand_ratio != 1:
             layers.extend(
                 [
-                    nn.Conv2d(in_channels, expanded_channels, kernel_size=1, bias=False),
+                    nn.Conv2d(
+                        in_channels, expanded_channels, kernel_size=1, bias=False
+                    ),
                     nn.BatchNorm2d(expanded_channels),
                     nn.ReLU(inplace=True),
                 ]
@@ -237,7 +239,9 @@ class FeatureFusion(nn.Module):
         )
         low_resolution_features = self.low_resolution_refine(low_resolution_features)
         low_resolution_features = self.low_resolution_project(low_resolution_features)
-        high_resolution_features = self.high_resolution_project(high_resolution_features)
+        high_resolution_features = self.high_resolution_project(
+            high_resolution_features
+        )
         return self.activation(high_resolution_features + low_resolution_features)
 
 
