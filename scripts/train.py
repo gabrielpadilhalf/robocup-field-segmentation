@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 import sys
 
+import torch
 from torch.utils.data import DataLoader
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +48,9 @@ def build_dataloaders(config: dict[str, object]) -> tuple[DataLoader, DataLoader
     dataset_config = config["dataset"]
     training_config = config["training"]
     dataset_root = Path(dataset_config["root"])
+    num_workers = training_config["num_workers"]
+    pin_memory = torch.cuda.is_available()
+    persistent_workers = num_workers > 0
 
     train_dataset = Torso21Dataset(
         root=dataset_root,
@@ -65,11 +69,17 @@ def build_dataloaders(config: dict[str, object]) -> tuple[DataLoader, DataLoader
         train_dataset,
         batch_size=training_config["batch_size"],
         shuffle=True,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        persistent_workers=persistent_workers,
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=training_config["batch_size"],
         shuffle=False,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        persistent_workers=persistent_workers,
     )
     return train_loader, val_loader
 
