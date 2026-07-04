@@ -9,6 +9,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 from field_segmentation.data.splits import load_split_file
+from field_segmentation.data.transforms import SegmentationTransform
 
 
 @dataclass(frozen=True)
@@ -44,15 +45,13 @@ class Torso21Dataset(Dataset[dict[str, Any]]):
         self,
         root: Path,
         subset: str,
+        transform: SegmentationTransform,
         split_file: Path | None = None,
-        image_transform: Callable[[Image.Image], Any] | None = None,
-        mask_transform: Callable[[np.ndarray], Any] | None = None,
     ) -> None:
         self.root = Path(root)
         self.subset = subset
         self.split_file = Path(split_file) if split_file is not None else None
-        self.image_transform = image_transform
-        self.mask_transform = mask_transform
+        self.transform = transform
         self.samples = self._build_samples()
 
     def __len__(self) -> int:
@@ -60,13 +59,10 @@ class Torso21Dataset(Dataset[dict[str, Any]]):
 
     def __getitem__(self, index: int) -> dict[str, Any]:
         sample = self.samples[index]
-        image = Image.open(sample.image_path).convert("RGB")
+        image = np.array(Image.open(sample.image_path).convert("RGB"))
         mask = self.load_binary_mask(sample.mask_path)
 
-        if self.image_transform is not None:
-            image = self.image_transform(image)
-        if self.mask_transform is not None:
-            mask = self.mask_transform(mask)
+        image, mask = self.transform.apply(image, mask)
 
         return {
             "filename": sample.filename,

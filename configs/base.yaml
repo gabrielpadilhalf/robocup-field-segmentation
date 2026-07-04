@@ -20,3 +20,11 @@ training:
 
 evaluation:
   primary_metrics: ["iou_field", "dice"]
+
+transforms:
+  prob_horizontal_flip: 0.5
+  prob_brightness_contrast: 0.3
+  prob_random_shift_scale_rotate: 0.4
+  shift_limit: 0.03
+  scale_limit: 0.1
+  rotate_limit: 10
