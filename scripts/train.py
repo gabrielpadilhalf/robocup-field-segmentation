@@ -13,7 +13,8 @@ if str(SRC_ROOT) not in sys.path:
 
 from field_segmentation.data.dataset import Torso21Dataset
 from field_segmentation.data.transforms import SegmentationTransform
-from field_segmentation.models.small_unet import UNet
+from field_segmentation.models.fast_scnn import FastSCNN
+from field_segmentation.models.small_unet import SmallUNet
 from field_segmentation.train.trainer import Trainer
 from field_segmentation.utils.config import load_config
 
@@ -22,8 +23,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train a segmentation model.")
     parser.add_argument(
         "--model",
-        choices=("unet", "fast_scnn"),
-        default="unet",
+        choices=("small_unet", "fast_scnn"),
+        default="small_unet",
         help="Model architecture to train.",
     )
     parser.add_argument(
@@ -35,10 +36,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_model(model_name: str):
-    if model_name == "unet":
-        return UNet()
+    if model_name == "small_unet":
+        return SmallUNet()
     if model_name == "fast_scnn":
-        raise NotImplementedError("fast_scnn is not implemented yet.")
+        return FastSCNN()
     raise ValueError(f"Unsupported model: {model_name}")
 
 
@@ -79,7 +80,10 @@ def main() -> int:
     model_config = load_config(REPO_ROOT / "configs" / f"{args.model}.yaml")
     if "training" not in model_config:
         raise KeyError(f"Model config for '{args.model}' must define a 'training' section.")
+    if "model" not in model_config:
+        raise KeyError(f"Model config for '{args.model}' must define a 'model' section.")
     config["training"] = model_config["training"]
+    config["model"] = model_config["model"]
     train_loader, val_loader = build_dataloaders(config)
     model = build_model(args.model)
     trainer = Trainer(

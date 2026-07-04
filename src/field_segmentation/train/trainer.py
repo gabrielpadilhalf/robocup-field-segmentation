@@ -33,7 +33,8 @@ class Trainer:
         model = self.model.to(device)
         checkpoints_dir = Path(self.model_config["paths"]["checkpoints_dir"])
         checkpoints_dir.mkdir(parents=True, exist_ok=True)
-        best_weights_path = checkpoints_dir / "unet_best.pth"
+        model_name = self.model_config["model"]["name"]
+        best_weights_path = checkpoints_dir / f"{model_name}_best.pth"
 
         criterion = torch.nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)

@@ -36,7 +36,7 @@ class DoubleConv(nn.Module):
         return self.double_conv(x)
 
 
-class UNet(nn.Module):
+class SmallUNet(nn.Module):
     """
     Small U-Net architecture for image segmentation.
     """
