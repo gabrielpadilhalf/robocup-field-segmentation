@@ -68,8 +68,12 @@ class Trainer:
             train_loss = train_loss / len(self.train_loader)
             train_history.append(train_loss)
 
-            val_metrics : Metrics = eval_model(
-                model, criterion, self.val_loader, device=torch.device(device)
+            val_metrics: Metrics = eval_model(
+                model,
+                criterion,
+                self.val_loader,
+                torch.device(device),
+                desc=f"Val Epoch {epoch+1}/{num_epochs}",
             )
 
             val_history.append(val_metrics)

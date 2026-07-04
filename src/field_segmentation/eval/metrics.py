@@ -1,8 +1,12 @@
 """Segmentation metrics such as IoU and Dice."""
 
+from __future__ import annotations
+
+from dataclasses import dataclass
+
 import torch
 from torch import nn
-from dataclasses import dataclass
+from tqdm import tqdm
 
 
 @dataclass(frozen=True)
@@ -19,6 +23,7 @@ def eval_model(
     criterion: nn.Module,
     loader: torch.utils.data.DataLoader,
     device: torch.device,
+    desc: str | None = None,
 ) -> Metrics:
     """
     Evaluate UNet model on training, validation, and test sets.
@@ -37,7 +42,8 @@ def eval_model(
         total_true_positives = 0
         total_false_positives = 0
         total_false_negatives = 0
-        for batch in loader:
+        iterator = tqdm(loader, desc=desc) if desc is not None else loader
+        for batch in iterator:
             images = batch["image"]
             masks = batch["mask"]
             images = images.to(device)
@@ -49,6 +55,8 @@ def eval_model(
             total_true_positives += ((prediction == 1) & (target == 1)).sum().item()
             total_false_positives += ((prediction == 1) & (target != 1)).sum().item()
             total_false_negatives += ((prediction != 1) & (target == 1)).sum().item()
+            if desc is not None:
+                iterator.set_postfix(loss=total_loss / max(1, len(loader)))
 
     EPSILON = 1e-7
     iou = total_true_positives / (
