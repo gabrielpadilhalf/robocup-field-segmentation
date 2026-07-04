@@ -79,7 +79,7 @@ class Trainer:
 
             val_history.append(val_metrics)
 
-            # Save best model based on validation loss
+            # Save best model based on validation iou
             if val_metrics.iou > best_val_iou:
                 best_val_iou = val_metrics.iou
                 best_iteration = epoch
