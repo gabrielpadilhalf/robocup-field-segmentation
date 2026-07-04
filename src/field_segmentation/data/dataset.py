@@ -68,8 +68,8 @@ class Torso21Dataset(Dataset[dict[str, Any]]):
             "filename": sample.filename,
             "image": image,
             "mask": mask,
-            "image_path": sample.image_path,
-            "mask_path": sample.mask_path,
+            "image_path": str(sample.image_path),
+            "mask_path": str(sample.mask_path),
         }
 
     def _build_samples(self) -> list[Torso21SamplePaths]:

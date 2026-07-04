@@ -13,11 +13,6 @@ dataset:
   test_split_file: .local/dataset/reality/test_images.txt
   input_size: [640, 480]
 
-training:
-  seed: 42
-  epochs: 50
-  batch_size: 8
-
 evaluation:
   primary_metrics: ["iou_field", "dice"]
 

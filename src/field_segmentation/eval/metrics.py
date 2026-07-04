@@ -37,23 +37,18 @@ def eval_model(
         total_true_positives = 0
         total_false_positives = 0
         total_false_negatives = 0
-        for images, masks in loader:
+        for batch in loader:
+            images = batch["image"]
+            masks = batch["mask"]
             images = images.to(device)
             masks = masks.to(device)
             outputs = model(images)
             total_loss += criterion(outputs, masks).item()
-
-            if masks.ndim == 3:  # todo: remove this conditional
-                masks = masks.unsqueeze(1)
-
-            prediction = torch.sigmoid(outputs) > 0.5
-            if masks.ndim == 3:
-                masks = masks.unsqueeze(1)
-
-            target = masks > 0.5
-            total_true_positives += (prediction & target).sum().item()
-            total_false_positives += (prediction & ~target).sum().item()
-            total_false_negatives += (~prediction & target).sum().item()
+            prediction = torch.argmax(outputs, dim=1)
+            target = masks
+            total_true_positives += ((prediction == 1) & (target == 1)).sum().item()
+            total_false_positives += ((prediction == 1) & (target != 1)).sum().item()
+            total_false_negatives += ((prediction != 1) & (target == 1)).sum().item()
 
     EPSILON = 1e-7
     iou = total_true_positives / (

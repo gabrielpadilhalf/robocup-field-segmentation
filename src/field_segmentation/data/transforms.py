@@ -1,9 +1,10 @@
 """Image and mask transforms for training and evaluation."""
 
+from __future__ import annotations
+
 import cv2
-import torch
-from typing import Tuple
 import albumentations as A
+import numpy as np
 import torch
 from albumentations.pytorch import ToTensorV2
 
@@ -13,8 +14,9 @@ from typing import Any
 class SegmentationTransform:
     def __init__(self, base_config: dict[str, Any], train: bool):
         self._config: dict = base_config["transforms"]
-        self._new_width = self._config["image_size"][0]
-        self._new_height = self._config["image_size"][1]
+        image_size = base_config["dataset"]["input_size"]
+        self._new_width = image_size[0]
+        self._new_height = image_size[1]
         self._train = train
 
         self._train_transform = A.Compose(
@@ -52,9 +54,9 @@ class SegmentationTransform:
             ]
         )
 
-    def apply(self, image, mask) -> Tuple[torch.Tensor, torch.Tensor]:
+    def apply(self, image: np.ndarray, mask: np.ndarray) -> tuple[torch.Tensor, torch.Tensor]:
         if self._train:
             result = self._train_transform(image=image, mask=mask)
         else:
             result = self._eval_transform(image=image, mask=mask)
-        return result["image"], result["mask"]
+        return result["image"], result["mask"].to(torch.long)
