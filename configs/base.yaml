@@ -4,6 +4,7 @@ project:
 
 paths:
   checkpoints_dir: .local/checkpoints
+  training_plots_dir: .local/training_plots
 
 dataset:
   name: torso21

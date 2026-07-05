@@ -5,12 +5,17 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import matplotlib
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from field_segmentation.eval.metrics import Metrics, eval_model
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
 
 
 class Trainer:
@@ -26,6 +31,32 @@ class Trainer:
         self.config = model_config["training"]
         self.train_loader = train_loader
         self.val_loader = val_loader
+
+    def _save_training_plot(
+        self,
+        train_history: list[float],
+        val_history: list[Metrics],
+    ) -> Path:
+        model_name = self.model_config["model"]["name"]
+        plots_dir = Path(self.model_config["paths"]["training_plots_dir"])
+        plots_dir.mkdir(parents=True, exist_ok=True)
+        output_path = plots_dir / f"{model_name}_training_metrics.png"
+
+        epochs = list(range(1, len(train_history) + 1))
+        plt.figure(figsize=(10, 6))
+        plt.plot(epochs, train_history, label="train loss")
+        plt.plot(epochs, [metric.loss for metric in val_history], label="val loss")
+        plt.plot(epochs, [metric.iou for metric in val_history], label="val iou")
+        plt.plot(epochs, [metric.dice for metric in val_history], label="val dice")
+        plt.title(f"Training Metrics - {model_name}")
+        plt.xlabel("Epoch")
+        plt.ylabel("Value")
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(output_path)
+        plt.close()
+        return output_path
 
     def train(self) -> None:
         torch.manual_seed(self.config["seed"])  # for reproducibility
@@ -95,3 +126,5 @@ class Trainer:
             f"Best model saved at epoch {best_iteration+1} with val iou "
             f"{best_val_iou:.4f} at {best_weights_path}"
         )
+        plot_path = self._save_training_plot(train_history, val_history)
+        print(f"Training metrics plot saved to {plot_path}")
