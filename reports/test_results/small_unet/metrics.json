@@ -1,0 +1,6 @@
+{
+  "dice": 0.9804220828133726,
+  "iou": 0.9615960352679084,
+  "model": "small_unet",
+  "test_image_count": 1570
+}

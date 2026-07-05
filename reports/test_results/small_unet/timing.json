@@ -1,0 +1,8 @@
+{
+  "average_image_seconds": 0.13678539353990346,
+  "device": "cpu",
+  "discarded_image_count": 5,
+  "image_count": 50,
+  "model": "small_unet",
+  "total_timed_seconds": 6.839269676995173
+}
