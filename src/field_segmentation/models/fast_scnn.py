@@ -179,7 +179,7 @@ class DownsamplingStem(nn.Module):
         return self.separable_block2(x)
 
 
-class ContextEncoder(nn.Module):
+class GlobalFeatureExtractor(nn.Module):
     """Low-resolution feature extractor with global context pooling."""
 
     def __init__(self) -> None:
@@ -280,14 +280,14 @@ class FastSCNN(nn.Module):
     def __init__(self, in_channels: int = 3, n_classes: int = 2) -> None:
         super().__init__()
         self.downsampling_stem = DownsamplingStem(in_channels)
-        self.context_encoder = ContextEncoder()
+        self.feature_extractor = GlobalFeatureExtractor()
         self.feature_fusion = FeatureFusion()
         self.segmentation_head = SegmentationHead(n_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         input_size = x.shape[-2:]
         high_resolution_features = self.downsampling_stem(x)
-        low_resolution_features = self.context_encoder(high_resolution_features)
+        low_resolution_features = self.feature_extractor(high_resolution_features)
         fused_features = self.feature_fusion(
             high_resolution_features,
             low_resolution_features,
