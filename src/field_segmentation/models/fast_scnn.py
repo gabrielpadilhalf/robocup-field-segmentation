@@ -7,6 +7,33 @@ from torch import nn
 from torch.nn import functional as F
 
 
+class FastSCNN(nn.Module):
+    """Fast-SCNN segmentation model."""
+
+    def __init__(self, in_channels: int = 3, n_classes: int = 2) -> None:
+        super().__init__()
+        self.downsampling_stem = DownsamplingStem(in_channels)
+        self.feature_extractor = GlobalFeatureExtractor()
+        self.feature_fusion = FeatureFusion()
+        self.segmentation_head = SegmentationHead(n_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        input_size = x.shape[-2:]
+        high_resolution_features = self.downsampling_stem(x)
+        low_resolution_features = self.feature_extractor(high_resolution_features)
+        fused_features = self.feature_fusion(
+            high_resolution_features,
+            low_resolution_features,
+        )
+        logits = self.segmentation_head(fused_features)
+        return F.interpolate(
+            logits,
+            size=input_size,
+            mode="bilinear",
+            align_corners=False,
+        )
+
+
 class ConvNormAct(nn.Module):
     """Convolution followed by batch normalization and ReLU."""
 
@@ -272,30 +299,3 @@ class SegmentationHead(nn.Module):
         x = self.block1(x)
         x = self.block2(x)
         return self.classifier(x)
-
-
-class FastSCNN(nn.Module):
-    """Fast-SCNN segmentation model."""
-
-    def __init__(self, in_channels: int = 3, n_classes: int = 2) -> None:
-        super().__init__()
-        self.downsampling_stem = DownsamplingStem(in_channels)
-        self.feature_extractor = GlobalFeatureExtractor()
-        self.feature_fusion = FeatureFusion()
-        self.segmentation_head = SegmentationHead(n_classes)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        input_size = x.shape[-2:]
-        high_resolution_features = self.downsampling_stem(x)
-        low_resolution_features = self.feature_extractor(high_resolution_features)
-        fused_features = self.feature_fusion(
-            high_resolution_features,
-            low_resolution_features,
-        )
-        logits = self.segmentation_head(fused_features)
-        return F.interpolate(
-            logits,
-            size=input_size,
-            mode="bilinear",
-            align_corners=False,
-        )
