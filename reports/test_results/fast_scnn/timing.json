@@ -1,0 +1,8 @@
+{
+  "average_image_seconds": 0.02040702063961362,
+  "device": "cpu",
+  "discarded_image_count": 5,
+  "image_count": 50,
+  "model": "fast_scnn",
+  "total_timed_seconds": 1.020351031980681
+}
