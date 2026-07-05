@@ -6,6 +6,18 @@ paths:
   checkpoints_dir: .local/checkpoints
   training_plots_dir: .local/training_plots
 
+test:
+  batch_size: 8
+  num_workers: 2
+  timing_num_images: 50
+  timing_discard_first: 5
+  visualization_samples: 6
+  visualization_seed: 42
+  results_dir: .local/test_results
+  metrics_filename: metrics.json
+  timing_filename: timing.json
+  figure_filename: predictions_overview.png
+
 dataset:
   name: torso21
   root: .local/dataset/reality
