@@ -3,6 +3,7 @@ model:
 
 training:
   seed: 42
-  epochs: 50
+  epochs: 150
   batch_size: 28
   num_workers: 4
+  patience: 10

@@ -60,6 +60,7 @@ class Trainer:
 
     def train(self) -> None:
         torch.manual_seed(self.config["seed"])  # for reproducibility
+        patience = self.config["patience"]
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model = self.model.to(device)
         checkpoints_dir = Path(self.model_config["paths"]["checkpoints_dir"])
@@ -76,6 +77,7 @@ class Trainer:
         best_val_iou = float("-inf")
         best_iteration = -1
 
+        num_epochs_without_improvement = 0
         num_epochs = self.config.get("n_epochs", self.config.get("epochs", 1))
         for epoch in range(num_epochs):
             model.train()
@@ -111,16 +113,22 @@ class Trainer:
             val_history.append(val_metrics)
 
             # Save best model based on validation iou
+            num_epochs_without_improvement += 1
             if val_metrics.iou > best_val_iou:
                 best_val_iou = val_metrics.iou
                 best_iteration = epoch
                 torch.save(model.state_dict(), best_weights_path)
+                num_epochs_without_improvement = 0
 
             print(
                 f"Epoch [{epoch+1}/{num_epochs}] | Train Loss: {train_loss:.4f} | "
                 f"Val Loss: {val_metrics.loss:.4f} | Val IoU: {val_metrics.iou:.4f} | "
                 f"Val Dice: {val_metrics.dice:.4f}"
             )
+
+            if num_epochs_without_improvement >= patience:
+                print(f"Early stopping at epoch {epoch+1}")
+                break
 
         print(
             f"Best model saved at epoch {best_iteration+1} with val iou "
