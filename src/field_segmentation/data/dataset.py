@@ -24,13 +24,6 @@ class Torso21SamplePaths:
 class Torso21Dataset(Dataset[dict[str, Any]]):
     """TORSO21 dataset for binary field segmentation.
 
-    The physical dataset layout is expected to be:
-
-    * ``<root>/train/images``
-    * ``<root>/train/segmentations``
-    * ``<root>/test/images``
-    * ``<root>/test/segmentations``
-
     The expected usage is:
 
     * pass a local ``split_file`` for derived ``train`` and ``val`` splits
@@ -129,12 +122,8 @@ class Torso21Dataset(Dataset[dict[str, Any]]):
 
     @staticmethod
     def load_binary_mask(mask_path: Path) -> np.ndarray:
-        """Map any non-black segmentation pixel to the field class.
-
-        The downloaded segmentations currently encode field and field lines with
-        non-zero RGB values and background as black. Treating any non-black
-        pixel as ``field`` correctly collapses ``field`` and ``line`` into the
-        positive class.
+        """Map any non-black segmentation pixel to the field class. This is needed because the torso 21 segmentation
+        encodes field and field lines with non-zero RGB values and background as black.
         """
 
         mask = np.array(Image.open(mask_path).convert("RGB"), dtype=np.uint8)
