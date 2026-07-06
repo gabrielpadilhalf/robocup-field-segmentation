@@ -1,0 +1,41 @@
+project:
+  name: robocup-field-segmentation
+  task: binary_field_segmentation
+
+paths:
+  checkpoints_dir: .local/checkpoints
+  training_plots_dir: .local/training_plots
+
+test:
+  batch_size: 8
+  num_workers: 2
+  timing_num_images: 50
+  timing_discard_first: 5
+  visualization_samples: 6
+  visualization_seed: 42
+  results_dir: .local/test_results
+  metrics_filename: metrics.json
+  timing_filename: timing.json
+  figure_filename: predictions_overview.png
+
+dataset:
+  name: torso21
+  root: .local/dataset/reality
+  train_subset: train
+  val_subset: train
+  test_subset: test
+  train_split_file: .local/splits/train.txt
+  val_split_file: .local/splits/val.txt
+  test_split_file: .local/dataset/reality/test_images.txt
+  input_size: [640, 480]
+
+evaluation:
+  primary_metrics: ["iou_field", "dice"]
+
+transforms:
+  prob_horizontal_flip: 0.5
+  prob_brightness_contrast: 0.3
+  prob_random_shift_scale_rotate: 0.4
+  shift_limit: 0.03
+  scale_limit: 0.1
+  rotate_limit: 10

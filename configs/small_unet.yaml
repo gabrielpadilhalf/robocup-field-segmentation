@@ -1,0 +1,9 @@
+model:
+  name: small_unet
+
+training:
+  seed: 42
+  epochs: 150
+  batch_size: 14
+  num_workers: 2
+  patience: 10
