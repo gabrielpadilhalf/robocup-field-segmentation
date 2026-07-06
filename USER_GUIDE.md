@@ -7,6 +7,21 @@ Create and activate a virtual environment, then install the dependencies:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
+```
+
+Install `torch` and `torchvision` separately first, using the version appropriate for your machine. Then install the remaining dependencies from `requirements.txt`.
+
+Example for a generic installation:
+
+```bash
+pip install torch torchvision
+pip install -r requirements.txt
+```
+
+Example for CUDA:
+
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
 pip install -r requirements.txt
 ```
 
@@ -65,4 +80,3 @@ The script expects:
 
 - `.local/checkpoints/small_unet_best.pth`
 - `.local/checkpoints/fast_scnn_best.pth`
-
